@@ -1,49 +1,16 @@
-const express = require("express");
-const session = require('express-session');
-const app = express();
-const cors = require("cors");
-const bodyPaser = require('body-parser');
-const mongoose = require("mongoose");
-const MongoStore = require('connect-mongo')(session);
-var User = require('./models/UserInfo')
+// const express = require("express");
+// const session = require('express-session');
+// const app = express();
+// const cors = require("cors");
+// const bodyPaser = require('body-parser');
+// const mongoose = require("mongoose");
+// const MongoStore = require('connect-mongo')(session);
 
-// require package for mongodb
-require("dotenv/config");
-app.use(express.urlencoded({extended:false}));
-app.use(express.json());
-app.use(cors());
+// var User = require('../models/UserInfo')
 
-// path for different page and database connections
-const routeCourses = require("./routes/courses");
-const routeUsers = require("./routes/userInfo");
-const routeGallery = require("./routes/gallery");
-const routeRecipes = require("./routes/recipes");
-const substituteRoute = require("./routes/substitute");
-//const rountesession = require("./routes/session");
+// app.use(cors());
 
-
-// Middleware
-app.use("/api/courses", routeCourses);
-app.use("/api/userInfo", routeUsers);
-app.use("/api/gallery", routeGallery);
-app.use("/api/recipes", routeRecipes);
-app.use("/api/substitution", substituteRoute);
-//app.use("/api/session", rountesession);
-
-// homepage
-app.get("/", (req,res) => {
-    res.send("we are on 5000 homepage")
-});
-
-// connect to mongoose
-mongoose.connect(
-     process.env.DB_CONNECTION, 
-    {useNewUrlParser:true},
-     () =>console.log("database is conncted")    
-);
-// variable for connecting to mongoose dataset for maintain login status
-//var conn = mongoose.connection;
-
+// var conn = mongoose.connection;
 // conn.on('connected',() =>{
 //     console.log('MongoDB connected')
 // });
@@ -115,8 +82,3 @@ mongoose.connect(
 //       });
 //     }
 //   });
-
-// setport
-const PORT = process.env.PORT  || 3456;
-
-app.listen(PORT, () => console.log(`listening on ${PORT}`));
