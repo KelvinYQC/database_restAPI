@@ -37,6 +37,8 @@ router.post("/", async(req,res) => {
         name:req.body.name,
         instruction:req.body.instruction,
         ingredientsName:req.body.ingredientsName,
+        difficulty:req.body.difficulty,
+
 
         ingredientsSupplierLink:req.body.ingredientsSupplierLink,
         ingredientsSubsititution:req.body.ingredientsSubsititution,
@@ -73,7 +75,8 @@ router.patch("/:recipeID", async (req, res) => {
             name:req.body.name,
             instruction:req.body.instruction,
             ingredientsName:req.body.ingredientsName,
-    
+            difficulty:req.body.difficulty,
+
             ingredientsSupplierLink:req.body.ingredientsSupplierLink,
             ingredientsSubsititution:req.body.ingredientsSubsititution,
     

@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const recipeSchema = mongoose.Schema({
     recipeID: {
         type: Number,
-        required:true
     },
     name:{
         type: String,
@@ -40,7 +39,10 @@ const recipeSchema = mongoose.Schema({
     },
     commentCreatedBy:{
         type: Number
-    }
+    },
+    difficulty: {
+        type: Number
+        },
 });
 
 module.exports = mongoose.model('recipes', recipeSchema);

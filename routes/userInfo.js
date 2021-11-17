@@ -40,7 +40,11 @@ router.post("/", async(req,res) => {
         recipeCreation:req.body.recipeCreation,
         commentReceived:req.body.commentReceived,
         likeReceived:req.body.likeReceived,
-        commentPublished:req.body.commentPublished
+        commentPublished:req.body.commentPublished,
+        userPost:req.body.userPost,
+        userPicture:req.body.userPicture,
+        discription:req.body.userPost
+
     });
     try{
         const savedUsers = await myuser.save();
@@ -70,6 +74,9 @@ router.patch("/:userID", async (req, res) => {
             commentReceived: req.body.commentReceived,
             likeReceived: req.body.likeReceived,
             commentPublished: req.body.commentPublished,
+            userPost:req.body.userPost,
+            userPicture:req.body.userPicture,
+            discription:req.body.userPost
           }
         }
       );
