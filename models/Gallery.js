@@ -4,10 +4,6 @@ const GallerySchema = mongoose.Schema({
         type: Number,
         required:true
     },
-    likerecived:{
-        type: Number,
-    },
-    
     userID:{
         type: Number
         },
@@ -21,20 +17,23 @@ const GallerySchema = mongoose.Schema({
     media:{
         type: String,
     },
-    commentsContent:{
-        type: String,
-    },
-    commentsuserID:{
-        type: Number,
-    },
-    commentsLikerecived:{
-        type: Number,
-    },
+    comment:[{
+        commentsuserID:{
+            type: Number,
+        },
+        commentsContent:{
+            type: String,
+        },
+        commentsLikerecived:{
+            type: Number,
+        },
+        commentsCreationdate:{
+            type: Date,
+            default : Date.now
+        },
+    }],
     
-    commentsCreationdate:{
-        type: Date,
-        default : Date.now
-    },
+
 });
 
 module.exports = mongoose.model('gallery', GallerySchema);
