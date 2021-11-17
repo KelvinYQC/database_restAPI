@@ -15,9 +15,9 @@ router.get("/",async(req,res)=>{
 });
 
 // get one the recipes
-router.get("/:recipeID", async (req,res) => {
+router.get("/:substituteID", async (req,res) => {
     try{
-        const id = req.params.recipeID;
+        const id = req.params.substituteID;
         const users = await UserInfo.findById(id);
         if(users){
                 res.status(200).json(users);
@@ -50,9 +50,9 @@ router.post("/", async(req,res) => {
 }); 
 
 // update a recipes
-router.patch("/:recipeID", async (req, res) => {
+router.patch("/:substituteID", async (req, res) => {
     try {
-      const id = req.params.recipeID;
+      const id = req.params.substituteID;
       const updatedCourse = await UserInfo.updateOne(
         { _id: id },
         {
@@ -70,9 +70,9 @@ router.patch("/:recipeID", async (req, res) => {
   });
 
   // delete a recipes
-  router.delete("/:recipeID", async (req, res) => {
+  router.delete("/:substituteID", async (req, res) => {
     try {
-      const id = req.params.recipeID;
+      const id = req.params.substituteID;
       const removedCourse = await UserInfo.deleteOne({ _id: id });
       res.status(200).json(removedCourse);
     } catch (err) {
