@@ -27,7 +27,7 @@ app.use("/api/userInfo", routeUsers);
 app.use("/api/gallery", routeGallery);
 app.use("/api/recipes", routeRecipes);
 app.use("/api/substitution", routeSubstitute);
-// app.use("/api/verify", require("./routes/routes"));
+app.use("/api/verify", require("./routes/routes"));
 
 // homepage
 // app.get("/", (req,res) => {
@@ -37,64 +37,109 @@ app.use("/api/substitution", routeSubstitute);
 
 // code goes here
 
-var MongoDBSession = require('connect-mongodb-session')(session);
+// var MongoDBSession = require('connect-mongodb-session')(session);
 
-const store = new MongoDBSession({
-    uri:process.env.DB_CONNECTION,
-    collection:'sessions'
-});
+// const store = new MongoDBSession({
+//     uri:process.env.DB_CONNECTION,
+//     collection:'sessions'
+// });
 
-store.on('error', function(error) {
-    console.log(error);
-  });
+// store.on('error', function(error) {
+//     console.log(error);
+//   });
 
-  app.use(session({
-    resave: false,
-    saveUninitialized: false,
-    secret: "secret",
-    store:store,
-    cookie:{
-        expires:10000000 // a day
-    }
-}))
+//   app.use(session({
+//     resave: false,
+//     saveUninitialized: false,
+//     secret: "secret",
+//     store:store,
+//     cookie:{
+//         expires:10000000 // a day
+//     }
+// }))
 
-app.use(csurf())
-app.get("/", (req, res) => {
-  let name = "Guest"
-
-  if (req.session.user) name = req.session.user
-
-  res.send(`
-  <h1>Welcome, ${name}</h1>
-  <form action="/choose-name" method="POST">
-    <input type="text" name="name" placeholder="Your name">
-    <input type="hidden" name="_csrf" value="${req.csrfToken()}">
-    <button>Submit</button>
-  </form>
-  <form action="/logout" method="POST">
-    <input type="hidden" name="_csrf" value="${req.csrfToken()}">
-    <button>Logout</button>
-  </form>
-  `)
-})
-
-app.post("/choose-name", (req, res) => {
-  req.session.user = req.body.name.trim()
-  res.send(`<p>Thank you</p> <a href="/">Back home</a>`)
-})
-
-app.post("/logout", (req, res) => {
-  req.session.destroy(err => {
-    res.redirect("/")
-  })
-})
+// const User = require('./models/UserInfo');
 
 
 
-///
+// app.use(csurf())
+// app.get("/api/verify/login", async(req, res) => {
+//   let user = "Guest"
+  
+// // enter if statement only if login successful
+//   if (req.session.email){
+//      email = req.session.email
+//      user = await User.findOne({ email}).exec();
+//      return res.send(
+       
+//       `
+//       <body>${user}</body>
+//       <form action="/api/verify/logout" method="POST">
+//      <input type="hidden" name="_csrf" value="${req.csrfToken()}">
+//      <button>Logout</button>
+//    </form>`)
+//   }
+
+//   res.send(`
+//   <h1>${user}</h1>
+//   <form action="/api/verify/login" method="POST">
+//     <input type="text" name="password" placeholder="Your password">
+//     <input type="text" name="email" placeholder="Your email">
+//     <input type="hidden" name="_csrf" value="${req.csrfToken()}">
+//     <button>Submit</button>
+//   </form>
+//   <form action="/api/verify/logout" method="POST">
+//     <input type="hidden" name="_csrf" value="${req.csrfToken()}">
+//     <button>Logout</button>
+//   </form>
+//   `)
+// })
 
 
+// app.post("/api/verify/login", async(req, res) => {
 
+//   const { password } = req.body
+//     const {email} = req.body
+// console.log(password)
+// console.log(email)
+//     // Check we have an email
+//     if (!email) {
+//          res.status(422).send({ 
+//              message: "Missing email." 
+//         });
+//     }
+//     try{
+//         // Step 1 - Verify a user with the email exists
+//         const user = await User.findOne({ email, password}).exec();
+//         if (!user) {
+//              res.status(404).send({ 
+//                    message: "Password or username is incorrect" 
+//              });
+//         }
+//         // Step 2 - Ensure the account has been verified
+//         if(!user.verified){
+//               res.status(403).send({ 
+//                    message: "Verify your Account." 
+//              });
+//             }
+//           if(user){
+//             console.log("----------")
+//              req.session.email = req.body.email.trim()
+//              req.session.password = req.body.password.trim()
+      
+//             res.send(`<p>Thank you</p> <a href="/api/verify/login">Back home</a>`)
+//           }
+          
+//           } catch(err) {
+//           res.status(500).send(err);
+// }
+// })
+
+// app.post("/api/verify/logout", (req, res) => {
+//   req.session.destroy(err => {
+//     res.redirect("/api/verify/login")
+//   })
+// })
 
 
 // connect to mongoose

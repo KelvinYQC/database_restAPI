@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const UserController = require('../controllers/user_controller.js');
 const nodemailer = require('nodemailer');
+const csurf = require("csurf");
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const app = express()
 const User = require('../models/UserInfo.js');
 const Session = require('../models/session');
 const { application } = require('express');
@@ -28,101 +28,104 @@ const transporter = nodemailer.createTransport({
 
 router.use(cookieParser())
 
-// const store = new MongoDBSession({
-//     uri:process.env.DB_CONNECTION,
-//     collection:'sessions'
-// });
+var MongoDBSession = require('connect-mongodb-session')(session);
 
-// store.on('error', function(error) {
-//     console.log(error);
-//   });
+const store = new MongoDBSession({
+    uri:process.env.DB_CONNECTION,
+    collection:'sessions'
+});
 
-//   router.use(session({
-//     key:"email",
-//     resave: false,
-//     saveUninitialized: false,
-//     secret: "secret",
-//     store:store,
-//     cookie:{
-//         expires:10000000 // a day
-//     }
-// }))
+store.on('error', function(error) {
+    console.log(error);
+  });
 
-// var sessionChecker = (req,res,next)=>{
-//     if ( req.session.user && req.cookies.email){
-//         res.redirect('./dashboard')
-// }
-// else{
-//     next()
-// }
-// }
-// app.get('/', sessionChecker,(req,res)=>{
-//     res.redirect('/login')
-// })
-
-//  const redirectlogin = (req,res,next) =>{
-//      if(!req.session.userId){
-//          res.redirect('./login')
-//      }
-//      else{
-//          next()
-//      }
-//  }
-
-
-//  const redirecthome = (req,res,next)=>{
-//      if(req.session.userId){
-//          res.redirect('./dashboard')
-//      } else{
-//          next()
-//      }   
-//  }
-
-router.use((req,res,next)=>{
-    const {id} = req.session
-    console.log(id)
-    if(id){
-        res.locals.user = User.findOne({id})
+  router.use(session({
+    resave: false,
+    saveUninitialized: false,
+    secret: "secret",
+    store:store,
+    cookie:{
+        expires:10000000 // a day
     }
-    
-    next()
+}))
+
+
+router.use(csurf())
+router.get("/login", async(req, res) => {
+  let user = "Guest"
+  
+// enter if statement only if login successful
+  if (req.session.email){
+     email = req.session.email
+     user = await User.findOne({ email}).exec();
+     return res.send(
+       
+      `
+      <body>${user}</body>
+      <form action="/api/verify/logout" method="POST">
+     <input type="hidden" name="_csrf" value="${req.csrfToken()}">
+     <button>Logout</button>
+   </form>`)
+  }
+
+  res.send(`
+  <h1>${user}</h1>
+  <form action="/api/verify/login" method="POST">
+    <input type="text" name="password" placeholder="Your password">
+    <input type="text" name="email" placeholder="Your email">
+    <input type="hidden" name="_csrf" value="${req.csrfToken()}">
+    <button>Submit</button>
+  </form>
+  <form action="/api/verify/logout" method="POST">
+    <input type="hidden" name="_csrf" value="${req.csrfToken()}">
+    <button>Logout</button>
+  </form>
+  `)
 })
 
-router.get("/dashboard",async(req,res)=>{
-    try{
-        const{user} = res.locals
-        //req.session.user = res.locals
-        // req.session.user = 'aaa'
-         //req.session.user = user
-        // ses = req.session
-        // console.log(ses)
-       // res.status(200).json(req.session.user);
 
-        // console.log(JSON.stringify(req.session.user))
+router.post("/login", async(req, res) => {
 
-        // const users = await Session.find();
-        // console.log(JSON.stringify(users))
-
-        // console.log("----------")
-        // res.status(200).json(users);
-    }catch(err){
-        res.status(500).json({message: err});
+  const { password } = req.body
+    const {email} = req.body
+    // Check we have an email
+    if (!email) {
+         res.status(422).send({ 
+             message: "Missing email." 
+        });
     }
-});
-
-router.get("/dashboardInfo",async(req,res)=>{
     try{
-        
-       // console.log("----------")
-       // const users = await Session.find();
-      //  console.log(JSON.stringify(users))
-       // console.log("----------")
-        res.status(200).json(req.session);
-    }catch(err){
-        res.status(500).json({message: err});
-    }
-});
+        // Step 1 - Verify a user with the email exists
+        const user = await User.findOne({ email, password}).exec();
+        if (!user) {
+             res.status(404).send({ 
+                   message: "Password or username is incorrect" 
+             });
+        }
+        // Step 2 - Ensure the account has been verified
+        if(!user.verified){
+              res.status(403).send({ 
+                   message: "Verify your Account." 
+             });
+            }
+          if(user){
+            console.log("----------")
+             req.session.email = req.body.email.trim()
+             req.session.password = req.body.password.trim()
+      
+            res.send(`<p>Thank you</p> <a href="/api/verify/login">Back home</a>`)
+          }
+          
+          } catch(err) {
+          res.status(500).send(err);
+}
+})
 
+router.post("/logout", (req, res) => {
+  req.session.destroy(err => {
+    res.redirect("./login")
+  })
+})
 
 router.get("/:_id", async (req,res) => {
     try{
@@ -137,25 +140,6 @@ router.get("/:_id", async (req,res) => {
             res.status(500).json({message:err});
         }
 });
-
-
-
-//  router.get('/dashboard',(req,res)=>{
-//      console.log("----------")
-//      console.log(JSON.stringify(req.session.user))
-//      console.log("----------")
-     
-//      // res.cookie("cookie", req.session.user);
-//      //return 
-//     return res.send('Hello ' + JSON.stringify(req.session.user._id));
-//  })
- 
-
-// router.get('/session',(req,res)=>{
-//     const {userId} = req.session
-//     console.log(userId)
-// })
-
 
  router.post('/logout', function(req,res){
      req.session.destroy(err =>{
@@ -236,7 +220,7 @@ router.post('/login', async (req, res) => {
         }
         
         if(user){
-            res.cookie("sky","blue1")
+
 
             req.session.id = user._id
         //  res.status(200).send({
