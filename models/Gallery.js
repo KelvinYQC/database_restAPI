@@ -17,6 +17,9 @@ const GallerySchema = mongoose.Schema({
     media:{
         type: String,
     },
+    likeCount:{
+        type: Number,
+    },
     comment:[{
         commentsuserID:{
             type: Number,
@@ -30,7 +33,8 @@ const GallerySchema = mongoose.Schema({
         commentsCreationdate:{
             type: Date,
             default : Date.now
-        },
+        }
+        
     }],
     
 
