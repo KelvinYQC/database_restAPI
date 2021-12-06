@@ -35,8 +35,8 @@ router.post("/", async(req,res) => {
     const myuser = new UserInfo({
         recipeID: req.body.recipeID,
         name:req.body.name,
-        instruction:req.body.instruction,
-        ingredientsName:req.body.ingredientsName,
+        instructions:req.body.instructions,
+        ingredients:req.body.ingredients,
         difficulty:req.body.difficulty,
 
 
@@ -73,8 +73,8 @@ router.patch("/:recipeID", async (req, res) => {
           $set: { 
             recipeID: req.body.recipeID,
             name:req.body.name,
-            instruction:req.body.instruction,
-            ingredientsName:req.body.ingredientsName,
+            instructions:req.body.instructions,
+            ingredients:req.body.ingredients,
             difficulty:req.body.difficulty,
 
             ingredientsSupplierLink:req.body.ingredientsSupplierLink,
