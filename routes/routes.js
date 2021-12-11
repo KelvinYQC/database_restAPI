@@ -36,7 +36,7 @@ const store = new MongoDBSession({
 });
 
 store.on('error', function(error) {
-    console.log(error);
+    //console.log(error);
   });
 
   router.use(session({
@@ -55,7 +55,7 @@ router.get("/login", async(req, res) => {
   let user = {}
 // enter if statement only if login successful
   if (req.session.email){
-    console.log("----")
+    //console.log("----")
      email =   req.session.email
      user = await User.findOne({ email}).exec();
      return res.status(200).json(user);
@@ -116,10 +116,10 @@ router.post("/login", async(req, res) => {
              });
             }
           if(user){
-            console.log("----------")
-             //req.session.email = req.body.email.trim()
-             //req.session.password = req.body.password.trim()
-             //res.redirect("./login")
+            //console.log("----------")
+             req.session.email = req.body.email.trim()
+             req.session.password = req.body.password.trim()
+          //   res.redirect("./login")
              res.status(200).json(user);
             // res.end();
             // res.send(`<p>Thank you</p> <a href="/api/verify/login">Back home</a>`)
@@ -136,8 +136,33 @@ router.post("/logout", (req, res) => {
   })
 })
 
+// router.get("/:_id", async (req,res) => {
+//     try{
+//         const id = req.params.user._id;
+//         const users = await Session.user.findById(id);
+//         if(users){
+//                 res.status(200).json(users);
+//             } else{
+//                 res.status(404).json({message: "No valid entry found"});
+//             }
+//         }   catch (err) {
+//             res.status(500).json({message:err});
+//         }
+// });
+
+//  router.post('/logout', function(req,res){
+//      req.session.destroy(err =>{
+//          if(err){
+//              return res.redirect('./dashboard')
+//          }
+//         res.clearCookie("email")
+//         res.redirect('/login')
+//         })
+//      })
+
 
 router.post('/signup', async (req, res) => {
+  
     const email = req.body.email
     const password = req.body.password
     const userName = req.body.userName
@@ -164,8 +189,9 @@ router.post('/signup', async (req, res) => {
        }).save();
        // Step 2 - Generate a verification token with the user's ID
        const verificationToken = user.generateVerificationToken();
+       
        // Step 3 - Email the user a unique verification link
-       const url = `http://localhost:3456/api/verify/${verificationToken}`
+       const url = `http://localhost:3456/api/verify/${verificationToken}`;
        transporter.sendMail({
          to: email,
          subject: 'Verify Account',
@@ -174,10 +200,57 @@ router.post('/signup', async (req, res) => {
          res.status(201).send({
          message: `Sent a verification email to ${email}`
        });
+       
    } catch(err){
        res.status(500).send(err);
    }
 });
+
+// router.post('/login', async (req, res) => {
+//     const { email } = req.body
+//     const {userName} = req.body
+
+//     // Check we have an email
+//     if (!email) {
+//          res.status(422).send({ 
+//              message: "Missing email." 
+//         });
+//     }
+//     try{
+//         // Step 1 - Verify a user with the email exists
+//         const user = await User.findOne({ email, userName}).exec();
+//         if (!user) {
+//              res.status(404).send({ 
+//                    message: "User does not exists" 
+//              });
+//         }
+//         // Step 2 - Ensure the account has been verified
+//         if(!user.verified){
+//               res.status(403).send({ 
+//                    message: "Verify your Account." 
+//              });
+//         }
+        
+//         if(user){
+
+
+//             req.session.id = user._id
+//         //  res.status(200).send({
+//         //       message: "User logged in"
+//         //  });
+//         // console.log(user)
+//         //res.cookie("cookie", req.session.user);
+//         res.redirect('./dashboard');
+//         }
+//      } catch(err) {
+//         res.status(500).send(err);
+//      }
+// });
+
+// router.get('/session',async(req,res)=>{
+//     res.send(req.session.user)
+// }
+// )
 
 router.get('/:id', async (req, res) => {
     const [token]  =  Object.values(req.params)   // Check we have an id
